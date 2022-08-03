@@ -1,47 +1,23 @@
-Add-WindowsCapability -Name Rsat.ActiveDirectory.DS-LDS.Tools~~~~0.0.1.0 -Online
 
- 
+$UserCSV   = 'C:\Users\kenny.bae\downloads\adobeusers.csv'
+$OutputCSV = 'C:\Users\kenny.bae\downloads\final.csv'
 
- 
-
-$UserCSV   = 'C:\Users\kenny.bae\downloads\waa.csv'
-
-$OutputCSV = 'C:\Users\kenny.bae\downloads\waaaaaaa.csv'
-
- 
 
 $Users = Import-Csv -Path $UserCSV |
-
     Select-Object -ExpandProperty email
 
- 
-
 $Results =foreach( $User in $Users ){
-
-    $Account = Get-ADUser -Filter { mail -eq $User }
-
- 
+    $Account = Get-ADUser -Filter { mail -eq $User -or userprincipalname -eq $User }
 
     if( $Account ){
-
-        $Account | Select-Object -Property SamAccountName, Enabled
-
+        $Account | Select-Object -Property userPrincipalName, Enabled
         }
-
     else{
-
         [pscustomobject]@{
-
-            SamAccountName = $User
-
+            userPrincipalName = $User
             Enabled        = 'Account Not Found'
-
             }
-
         }
-
     }
-
- 
 
 $Results | Export-Csv -Path $OutputCSV -NoTypeInformation
